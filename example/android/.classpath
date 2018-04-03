@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="app/build/generated/source/buildConfig/androidTest/debug"/>
+	<classpathentry kind="src" path="app/build/generated/source/buildConfig/debug"/>
+	<classpathentry kind="src" path="app/build/generated/source/r/debug"/>
+	<classpathentry kind="src" path="app/src/main/java"/>
+	<classpathentry kind="lib" path="app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.0.1/jars/classes.jar"/>
+	<classpathentry kind="lib" path="app/build/intermediates/exploded-aar/com.android.support/support-v4/23.0.1/jars/classes.jar"/>
+	<classpathentry kind="lib" path="app/build/intermediates/exploded-aar/com.android.support/support-v4/23.0.1/jars/libs/internal_impl-23.0.1.jar"/>
+	<classpathentry kind="lib" path="app/build/intermediates/exploded-aar/com.facebook.fbui.textlayoutbuilder/textlayoutbuilder/1.0.0/jars/classes.jar"/>
+	<classpathentry kind="lib" path="app/build/intermediates/exploded-aar/com.facebook.soloader/soloader/0.1.0/jars/classes.jar"/>
+	<classpathentry kind="lib" path="app/build/intermediates/exploded-aar/org.webkit/android-jsc/r174650/jars/classes.jar"/>
+	<classpathentry kind="lib" path="build/generated/mockable-android-23.jar"/>
+	<classpathentry kind="lib" path="gradle/wrapper/gradle-wrapper.jar"/>
+	<classpathentry kind="output" path="app/build/intermediates/classes/androidTest/debug"/>
+</classpath>
