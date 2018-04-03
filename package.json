@@ -11,6 +11,9 @@
     "type": "git",
     "url": "git+https://github.com/rigoiot/react-native-hikvision-video.git"
   },
+  "license": "MIT",
+  "description": "",
+  "keywords": "",
   "dependencies": {
     "minio": "^5.0.0",
     "react": "16.0.0-alpha.12",
