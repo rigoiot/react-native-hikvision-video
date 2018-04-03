@@ -96,11 +96,6 @@ def enableProguardInReleaseBuilds = false
 android {
     compileSdkVersion 24
     buildToolsVersion "23.0.1"
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ['libs']
-        }
-    }
     defaultConfig {
         applicationId "com.rigoiot.hikvideo"
         minSdkVersion 16

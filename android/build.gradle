@@ -1,28 +1,14 @@
 apply plugin: "com.android.library"
 
-/**
- * Run Proguard to shrink the Java bytecode in release builds.
- */
-def enableProguardInReleaseBuilds = false
-
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
 
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ['libs']
-        }
-    }
     defaultConfig {
-        applicationId "com.rigoiot.hikvideo"
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
-        ndk {
-            abiFilters "armeabi-v7a", "x86"
-        }
     }
     buildTypes {
         release {
