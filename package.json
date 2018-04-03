@@ -6,6 +6,11 @@
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest"
   },
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rigoiot/react-native-hikvision-video.git"
+  },
   "dependencies": {
     "minio": "^5.0.0",
     "react": "16.0.0-alpha.12",
