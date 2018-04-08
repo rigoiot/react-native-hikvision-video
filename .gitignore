@@ -87,3 +87,5 @@ project.xcworkspace
 .gradle
 local.properties
 *.hprof
+
+example/
