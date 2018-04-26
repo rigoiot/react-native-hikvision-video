@@ -164,18 +164,6 @@ public final class HikVideoView extends FrameLayout {
         m_iPlayID = -1;
     }
 
-    private void ptzControl() {
-        if (!HCNetSDK.getInstance().NET_DVR_PTZControl_Other(
-                m_iLogID, m_iStartChan, PTZCommand.TILT_UP, 0)) {
-            Log.e(TAG,
-                    "start PAN_LEFT failed with error code: "
-                            + HCNetSDK.getInstance()
-                            .NET_DVR_GetLastError());
-        } else {
-            Log.i(TAG, "start PAN_LEFT succ");
-        }
-    }
-
     public void loadView(String ip, int port, String user, String psd) {
 
         m_iLogID = loginNormalDevice(ip, port, user, psd);
@@ -190,5 +178,59 @@ public final class HikVideoView extends FrameLayout {
                 }
             }, 1000);
         }
+    }
+
+    public void ptzControl(String command) {
+        int i = 0;
+        switch (command) {
+        case "TILT_UP":
+            i = PTZCommand.TILT_UP;
+            break;
+        case "TILT_DOWN":
+            i = PTZCommand.TILT_DOWN;
+            break;
+        case "PAN_LEFT":
+            i = PTZCommand.PAN_LEFT;
+            break;
+        case "PAN_RIGHT":
+            i = PTZCommand.PAN_RIGHT;
+            break;
+        default:
+            break;
+        }
+        if (i == 0) {
+          return;
+        }
+        if (!HCNetSDK.getInstance().NET_DVR_PTZControlWithSpeed_Other(
+                m_iLogID, m_iStartChan, i, 0, 3)) {
+            Log.e(TAG,
+                    "start PAN_LEFT failed with error code: "
+                            + HCNetSDK.getInstance()
+                            .NET_DVR_GetLastError());
+        } else {
+            Log.i(TAG, "start PAN_LEFT succ");
+        }
+
+        if(!HCNetSDK.getInstance().NET_DVR_PTZControlWithSpeed_Other(m_iLogID, m_iStartChan, i, 0, 3))
+    		{
+    			Log.e(TAG, "NET_DVR_PTZControlWithSpeed_Other  PAN_RIGHT 0 faild!" + " err: " + HCNetSDK.getInstance().NET_DVR_GetLastError());
+    		}
+    		else
+    		{
+    			Log.e(TAG, "NET_DVR_PTZControlWithSpeed_Other  PAN_RIGHT 0 succ");
+    		}
+    		try {
+    			Thread.sleep(2000);
+    		} catch (InterruptedException e) {
+    			e.printStackTrace();
+    		}
+    		if(!HCNetSDK.getInstance().NET_DVR_PTZControlWithSpeed_Other(m_iLogID, m_iStartChan, i, 1, 3))
+    		{
+    			Log.e(TAG, "NET_DVR_PTZControlWithSpeed_Other  PAN_RIGHT 1 faild!" + " err: " + HCNetSDK.getInstance().NET_DVR_GetLastError());
+    		}
+    		else
+    		{
+    			Log.e(TAG, "NET_DVR_PTZControlWithSpeed_Other  PAN_RIGHT 1 succ");
+    		}
     }
 }

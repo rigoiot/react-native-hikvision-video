@@ -31,10 +31,14 @@ public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
   		try {
   			port = Integer.parseInt(source.getString("port"));
   		} catch (Exception e) {
-  			// TODO Auto-generated catch block
   			e.printStackTrace();
   		}
 
-        view.loadView(uri, port, user, psd);
+      view.loadView(uri, port, user, psd);
+    }
+
+    @ReactProp(name = "command")
+    public void setCommand(HikVideoView view, ReadableMap command) {
+        view.ptzControl(command.getString("command"));
     }
 }

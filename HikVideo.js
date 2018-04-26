@@ -5,7 +5,8 @@ import PropTypes from 'prop-types';
 export default class HikVideo extends React.Component {
   static propTypes = {
     ...View.propTypes,
-    source: PropTypes.object.isRequired
+    source: PropTypes.object.isRequired,
+    command: PropTypes.object
   };
 
   render() {
