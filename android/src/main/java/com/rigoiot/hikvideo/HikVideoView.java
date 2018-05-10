@@ -165,6 +165,8 @@ public final class HikVideoView extends FrameLayout {
 
     public void loadView(String ip, int port, String user, String psd) {
 
+        logout();
+
         m_iLogID = loginNormalDevice(ip, port, user, psd);
 
         if (m_iLogID >= 0) {
@@ -172,7 +174,6 @@ public final class HikVideoView extends FrameLayout {
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    stopSinglePreview();
                     startSinglePreview();
                 }
             }, 1000);
