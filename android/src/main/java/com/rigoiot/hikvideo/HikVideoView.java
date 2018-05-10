@@ -44,7 +44,8 @@ public final class HikVideoView extends FrameLayout {
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 LayoutParams.MATCH_PARENT,
                 LayoutParams.MATCH_PARENT);
-        params.gravity = Gravity.BOTTOM | Gravity.CENTER;
+        params.gravity = Gravity.CENTER;
+        params.setMargins(100,100,100,100);
         surfaceView.setLayoutParams(params);
         addView(surfaceView);
     }
@@ -116,7 +117,7 @@ public final class HikVideoView extends FrameLayout {
             return;
         }
 
-        Log.i(TAG, "m_iStartChan:" + m_iStartChan);
+        // Log.i(TAG, "m_iStartChan:" + m_iStartChan);
 
         NET_DVR_PREVIEWINFO previewInfo = new NET_DVR_PREVIEWINFO();
         previewInfo.lChannel = m_iStartChan;
@@ -127,7 +128,6 @@ public final class HikVideoView extends FrameLayout {
 
         m_iPlayID = HCNetSDK.getInstance().NET_DVR_RealPlay_V40(m_iLogID,
                 previewInfo, null);
-        Log.i(TAG, "m_iStartChan " + m_iStartChan);
         if (m_iPlayID < 0) {
             Log.e(TAG, "NET_DVR_RealPlay is failed!Err:"
                     + HCNetSDK.getInstance().NET_DVR_GetLastError());
@@ -139,8 +139,7 @@ public final class HikVideoView extends FrameLayout {
             Log.e(TAG, "NET_DVR_OpenSound Succ!");
         }
 
-        Log.i(TAG,
-                "NetSdk Play sucess ***********************3***************************");
+        // Log.i(TAG, "NetSdk Play sucess ***********************3***************************");
 
     }
 
@@ -180,7 +179,7 @@ public final class HikVideoView extends FrameLayout {
         }
     }
 
-    public void ptzControl(String command) {
+    public void ptzControl(String command, int dwStop) {
         int i = 0;
         switch (command) {
         case "TILT_UP":
@@ -211,26 +210,42 @@ public final class HikVideoView extends FrameLayout {
             Log.i(TAG, "start PAN_LEFT succ");
         }
 
-        if(!HCNetSDK.getInstance().NET_DVR_PTZControlWithSpeed_Other(m_iLogID, m_iStartChan, i, 0, 3))
+        if(!HCNetSDK.getInstance().NET_DVR_PTZControl_Other(m_iLogID, m_iStartChan, i, dwStop))
     		{
-    			Log.e(TAG, "NET_DVR_PTZControlWithSpeed_Other  PAN_RIGHT 0 faild!" + " err: " + HCNetSDK.getInstance().NET_DVR_GetLastError());
+    			Log.e(TAG, "NET_DVR_PTZControl_Other " + command +" "+dwStop+ " faild!" + " err: " + HCNetSDK.getInstance().NET_DVR_GetLastError());
     		}
     		else
     		{
-    			Log.e(TAG, "NET_DVR_PTZControlWithSpeed_Other  PAN_RIGHT 0 succ");
+    			Log.e(TAG, "NET_DVR_PTZControl_Other " + command +" "+dwStop+ " succ");
     		}
-    		try {
-    			Thread.sleep(2000);
-    		} catch (InterruptedException e) {
-    			e.printStackTrace();
-    		}
-    		if(!HCNetSDK.getInstance().NET_DVR_PTZControlWithSpeed_Other(m_iLogID, m_iStartChan, i, 1, 3))
-    		{
-    			Log.e(TAG, "NET_DVR_PTZControlWithSpeed_Other  PAN_RIGHT 1 faild!" + " err: " + HCNetSDK.getInstance().NET_DVR_GetLastError());
-    		}
-    		else
-    		{
-    			Log.e(TAG, "NET_DVR_PTZControlWithSpeed_Other  PAN_RIGHT 1 succ");
-    		}
+    		// try {
+    		// 	Thread.sleep(2000);
+    		// } catch (InterruptedException e) {
+    		// 	e.printStackTrace();
+    		// }
+    		// if(!HCNetSDK.getInstance().NET_DVR_PTZControlWithSpeed_Other(m_iLogID, m_iStartChan, i, 1, 3))
+    		// {
+    		// 	Log.e(TAG, "NET_DVR_PTZControlWithSpeed_Other  PAN_RIGHT 1 faild!" + " err: " + HCNetSDK.getInstance().NET_DVR_GetLastError());
+    		// }
+    		// else
+    		// {
+    		// 	Log.e(TAG, "NET_DVR_PTZControlWithSpeed_Other  PAN_RIGHT 1 succ");
+    		// }
     }
+
+    public void logout() {
+        stopSinglePreview();
+
+        if (m_iLogID != -1) {
+            if (!HCNetSDK.getInstance().NET_DVR_Logout_V30(m_iLogID)) {
+                Log.e(TAG, " NET_DVR_Logout is failed!");
+                //if (!HCNetSDKJNAInstance.getInstance().NET_DVR_DeleteOpenEzvizUser(m_iLogID)) {
+                //		Log.e(TAG, " NET_DVR_DeleteOpenEzvizUser is failed!");
+                return;
+            }
+            Log.i(TAG, " NET_DVR_Logout is succ!");
+            m_iLogID = -1;
+        }
+    }
+
 }

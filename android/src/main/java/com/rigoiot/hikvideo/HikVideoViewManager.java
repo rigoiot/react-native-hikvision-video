@@ -22,6 +22,12 @@ public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
         return textView;
     }
 
+    @Override
+    public void onDropViewInstance(HikVideoView view) {
+        super.onDropViewInstance(view);
+        view.logout();
+    }
+
     @ReactProp(name = "source")
     public void setSource(HikVideoView view, ReadableMap source) {
         String uri = source.getString("uri");
@@ -39,6 +45,6 @@ public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
 
     @ReactProp(name = "command")
     public void setCommand(HikVideoView view, ReadableMap command) {
-        view.ptzControl(command.getString("command"));
+        view.ptzControl(command.getString("command"), command.getInt("stop"));
     }
 }
