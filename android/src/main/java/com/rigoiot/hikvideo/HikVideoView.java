@@ -45,7 +45,6 @@ public final class HikVideoView extends FrameLayout {
                 LayoutParams.MATCH_PARENT,
                 LayoutParams.MATCH_PARENT);
         params.gravity = Gravity.CENTER;
-        params.setMargins(100,100,100,100);
         surfaceView.setLayoutParams(params);
         addView(surfaceView);
     }
@@ -219,19 +218,6 @@ public final class HikVideoView extends FrameLayout {
     		{
     			Log.e(TAG, "NET_DVR_PTZControl_Other " + command +" "+dwStop+ " succ");
     		}
-    		// try {
-    		// 	Thread.sleep(2000);
-    		// } catch (InterruptedException e) {
-    		// 	e.printStackTrace();
-    		// }
-    		// if(!HCNetSDK.getInstance().NET_DVR_PTZControlWithSpeed_Other(m_iLogID, m_iStartChan, i, 1, 3))
-    		// {
-    		// 	Log.e(TAG, "NET_DVR_PTZControlWithSpeed_Other  PAN_RIGHT 1 faild!" + " err: " + HCNetSDK.getInstance().NET_DVR_GetLastError());
-    		// }
-    		// else
-    		// {
-    		// 	Log.e(TAG, "NET_DVR_PTZControlWithSpeed_Other  PAN_RIGHT 1 succ");
-    		// }
     }
 
     public void logout() {

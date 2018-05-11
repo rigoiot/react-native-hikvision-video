@@ -1,15 +1,22 @@
 package com.rigoiot.hikvideo;
 
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.bridge.ReadableMap;
+
+import java.util.Map;
 
 /**
  * Created by oulp on 2018/3/23.
  */
 
 public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
+
+    private static final int COMMAND_PTZ_ID = 1;
+    private static final String COMMAND_PTZ_NAME = "ptzControl";
 
     @Override
     public String getName() {
@@ -28,6 +35,26 @@ public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
         view.logout();
     }
 
+    @Override
+    public Map<String, Integer> getCommandsMap() {
+        return MapBuilder.of(
+                COMMAND_PTZ_NAME, COMMAND_PTZ_ID
+        );
+    }
+
+//    @Override
+    public void receiveCommand(HikVideoView video, int commandId, ReadableArray args) {
+        switch (commandId){
+            case COMMAND_PTZ_ID:
+                if(args != null) {
+                    video.ptzControl(args.getString(0), args.getInt(1));
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
     @ReactProp(name = "source")
     public void setSource(HikVideoView view, ReadableMap source) {
         String uri = source.getString("uri");
@@ -41,10 +68,5 @@ public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
   		}
 
       view.loadView(uri, port, user, psd);
-    }
-
-    @ReactProp(name = "command")
-    public void setCommand(HikVideoView view, ReadableMap command) {
-        view.ptzControl(command.getString("command"), command.getInt("stop"));
     }
 }
