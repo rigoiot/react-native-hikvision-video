@@ -9,12 +9,14 @@ import android.util.Log;
 import android.view.SurfaceView;
 import android.widget.FrameLayout;
 import android.view.Gravity;
+import android.widget.Toast;
 
 import com.hcnetsdk.jna.HCNetSDKJNAInstance;
 import com.hikvision.netsdk.HCNetSDK;
 import com.hikvision.netsdk.NET_DVR_DEVICEINFO_V30;
 import com.hikvision.netsdk.NET_DVR_PREVIEWINFO;
 import com.hikvision.netsdk.PTZCommand;
+import com.hikvision.netsdk.NET_DVR_JPEGPARA;
 
 public final class HikVideoView extends FrameLayout {
 
@@ -233,6 +235,23 @@ public final class HikVideoView extends FrameLayout {
             Log.i(TAG, " NET_DVR_Logout is succ!");
             m_iLogID = -1;
         }
+    }
+
+    public void capturePicture(String fileName){
+      if (fileName == null) {
+        return;
+      }
+      NET_DVR_JPEGPARA strJpeg = new  NET_DVR_JPEGPARA();
+    	strJpeg.wPicQuality = 1;
+    	strJpeg.wPicSize = 2;
+    	if(!HCNetSDK.getInstance().NET_DVR_CaptureJPEGPicture(m_iLogID, m_iChanNum, strJpeg, new String(fileName)))
+    	{
+    		Log.i(TAG, "NET_DVR_CaptureJPEGPicture!" + " err: " + HCNetSDK.getInstance().NET_DVR_GetLastError());
+		  }
+    	else
+    	{
+    		Log.i(TAG, "NET_DVR_CaptureJPEGPicture! succeed");
+    	}
     }
 
 }

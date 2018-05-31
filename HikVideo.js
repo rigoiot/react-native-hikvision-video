@@ -17,6 +17,14 @@ export default class HikVideo extends React.Component {
     );
   }
 
+  capturePicture(fileName) {
+    UIManager.dispatchViewManagerCommand(
+      findNodeHandle(this.refs[RCT_VIDEO_REF]),
+      UIManager.HikVideoView.Commands.capturePicture,
+      [fileName]
+    );
+  }
+
   render() {
     return <RCTView ref={RCT_VIDEO_REF} {...this.props} />;
   }

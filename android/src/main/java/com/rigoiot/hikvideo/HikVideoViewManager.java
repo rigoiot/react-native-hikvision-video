@@ -18,6 +18,9 @@ public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
     private static final int COMMAND_PTZ_ID = 1;
     private static final String COMMAND_PTZ_NAME = "ptzControl";
 
+    private static final int COMMAND_CP_ID = 2;
+    private static final String COMMAND_CP_NAME = "capturePicture";
+
     @Override
     public String getName() {
         return "HikVideoView";
@@ -38,7 +41,8 @@ public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
     @Override
     public Map<String, Integer> getCommandsMap() {
         return MapBuilder.of(
-                COMMAND_PTZ_NAME, COMMAND_PTZ_ID
+                COMMAND_PTZ_NAME, COMMAND_PTZ_ID,
+                COMMAND_CP_NAME, COMMAND_CP_ID
         );
     }
 
@@ -48,6 +52,11 @@ public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
             case COMMAND_PTZ_ID:
                 if(args != null) {
                     video.ptzControl(args.getString(0), args.getInt(1));
+                }
+                break;
+            case COMMAND_CP_ID:
+                if(args != null) {
+                  video.capturePicture(args.getString(0));
                 }
                 break;
             default:
