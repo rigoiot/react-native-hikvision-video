@@ -11,7 +11,7 @@ import com.rigoiot.hikvideo.utils.HikUtil;
 public class HikVideoView extends Activity {
     private static final String TAG = "MainActivity";
     //----------------------------------------------------------------------------------------------
-    SurfaceView surfaceViewLeft; 
+    SurfaceView surfaceView; 
     //----------------------------------------------------------------------------------------------
     private static final int PLAY_HIK_STREAM_CODE = 1001;
     private static final int PLAY_HIK_STREAM_CODE_2 = 1002;
@@ -45,11 +45,11 @@ public class HikVideoView extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        surfaceViewLeft = findViewById(R.id.surfaceViewLeft); 
+        surfaceView = findViewById(R.id.surfaceView); 
 
         // HikUtil.initSDK();
         // hikUtil = new HikUtil();
-        // hikUtil.initView(surfaceViewLeft);
+        // hikUtil.initView(surfaceView);
         // hikUtil.setDeviceData(IP_ADDRESS, PORT, USER_NAME, PASSWORD);
         // hikUtil.loginDevice(mHandler, PLAY_HIK_STREAM_CODE); 
     }  
@@ -63,7 +63,7 @@ public class HikVideoView extends Activity {
     public void loadView(String ip, int port, String user, String psd) {
         HikUtil.initSDK();
         hikUtil = new HikUtil();
-        hikUtil.initView(surfaceViewLeft);
+        hikUtil.initView(surfaceView);
         hikUtil.setDeviceData(ip, port, user, psd);
         hikUtil.loginDevice(mHandler, PLAY_HIK_STREAM_CODE); 
     }
