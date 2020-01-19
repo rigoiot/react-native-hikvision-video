@@ -1,4 +1,4 @@
-package com.leslie.hik.utils;
+package com.rigoiot.hikvideo.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,6 +16,7 @@ import com.hikvision.netsdk.HCNetSDK;
 import com.hikvision.netsdk.NET_DVR_DEVICEINFO_V30;
 import com.hikvision.netsdk.NET_DVR_PREVIEWINFO;
 import com.hikvision.netsdk.RealPlayCallBack;
+import com.hikvision.netsdk.PTZCommand;
 
 import org.MediaPlayer.PlayM4.Player;
 
@@ -452,4 +453,71 @@ public class HikUtil {
         }
         return null;
     }
+
+    public void ptzControl(String command, int dwStop) {
+        Log.e(TAG, command + dwStop + "------");
+        int i = 0;
+        switch (command) {
+        case "TILT_UP":
+            i = PTZCommand.TILT_UP;
+            break;
+        case "TILT_DOWN":
+            i = PTZCommand.TILT_DOWN;
+            break;
+        case "PAN_LEFT":
+            i = PTZCommand.PAN_LEFT;
+            break;
+        case "PAN_RIGHT":
+            i = PTZCommand.PAN_RIGHT;
+            break;
+        case "UP_LEFT":
+            i = PTZCommand.UP_LEFT;
+            break;
+        case "UP_RIGHT":
+            i = PTZCommand.UP_RIGHT;
+            break;
+        case "DOWN_LEFT":
+            i = PTZCommand.DOWN_LEFT;
+            break;
+        case "DOWN_RIGHT":
+            i = PTZCommand.DOWN_RIGHT;
+            break;
+        case "ZOOM_IN":
+            i = PTZCommand.ZOOM_IN;
+            break;
+        case "ZOOM_OUT":
+            i = PTZCommand.ZOOM_OUT;
+            break;
+        case "FOCUS_NEAR":
+            i = PTZCommand.FOCUS_NEAR;
+            break;
+        case "FOCUS_FAR":
+            i = PTZCommand.FOCUS_FAR;
+            break;
+        default:
+            break;
+        }
+        if (i == 0) {
+          return;
+        }
+        if (!HCNetSDK.getInstance().NET_DVR_PTZControlWithSpeed_Other(
+                logId, m_iStartChan, i, 0, 3)) {
+            Log.e(TAG,
+                    "start PAN_LEFT failed with error code: "
+                            + HCNetSDK.getInstance()
+                            .NET_DVR_GetLastError());
+        } else {
+            Log.i(TAG, "start PAN_LEFT succ");
+        }
+
+        if(!HCNetSDK.getInstance().NET_DVR_PTZControl_Other(logId, m_iStartChan, i, dwStop))
+    		{
+    			Log.e(TAG, "NET_DVR_PTZControl_Other " + command +" "+dwStop+ " faild!" + " err: " + HCNetSDK.getInstance().NET_DVR_GetLastError());
+    		}
+    		else
+    		{
+    			Log.e(TAG, "NET_DVR_PTZControl_Other " + command +" "+dwStop+ " succ");
+    		}
+    }
+
 }
