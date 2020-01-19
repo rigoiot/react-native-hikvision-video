@@ -4,11 +4,15 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.Gravity;
 import android.view.SurfaceView;
+import android.widget.FrameLayout;
+import android.util.Log;
 
+import com.facebook.react.uimanager.ThemedReactContext;
 import com.rigoiot.hikvideo.utils.HikUtil;
 
-public class HikVideoView extends Activity {
+public final class HikVideoView extends FrameLayout {
     private static final String TAG = "MainActivity";
     //----------------------------------------------------------------------------------------------
     SurfaceView surfaceView; 
@@ -39,25 +43,23 @@ public class HikVideoView extends Activity {
         }
     });
     private HikUtil hikUtil; 
+ 
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    public HikVideoView(final ThemedReactContext themedReactContext) {
+        super(themedReactContext); 
 
-        surfaceView = findViewById(R.id.surfaceView); 
+        surfaceView = new SurfaceView(themedReactContext);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT);
+        params.gravity = Gravity.CENTER;
+        surfaceView.setLayoutParams(params);
+        addView(surfaceView);
+    }
 
-        // HikUtil.initSDK();
-        // hikUtil = new HikUtil();
-        // hikUtil.initView(surfaceView);
-        // hikUtil.setDeviceData(IP_ADDRESS, PORT, USER_NAME, PASSWORD);
-        // hikUtil.loginDevice(mHandler, PLAY_HIK_STREAM_CODE); 
-    }  
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        hikUtil.playOrStopStream(); 
+    public void onDropView() { 
+        hikUtil.playOrStopStream();
     }
 
     public void loadView(String ip, int port, String user, String psd) {
@@ -66,5 +68,9 @@ public class HikVideoView extends Activity {
         hikUtil.initView(surfaceView);
         hikUtil.setDeviceData(ip, port, user, psd);
         hikUtil.loginDevice(mHandler, PLAY_HIK_STREAM_CODE); 
+    }
+
+    public void ptzControl(String command, int dwStop) {
+        hikUtil.ptzControl(command, dwStop);
     }
 }

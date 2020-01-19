@@ -56,7 +56,7 @@ public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
                 break;
             case COMMAND_CP_ID:
                 if(args != null) {
-                  video.capturePicture(args.getString(0));
+                //   video.capturePicture(args.getString(0));
                 }
                 break;
             default:

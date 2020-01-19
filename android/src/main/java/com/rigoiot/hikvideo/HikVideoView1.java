@@ -18,7 +18,7 @@ import com.hikvision.netsdk.NET_DVR_PREVIEWINFO;
 import com.hikvision.netsdk.PTZCommand;
 import com.hikvision.netsdk.NET_DVR_JPEGPARA;
 
-public final class HikVideoView extends FrameLayout {
+public final class HikVideoView1 extends FrameLayout {
 
     // private PlaySurfaceView videoView;
     private SurfaceView surfaceView;
@@ -34,7 +34,7 @@ public final class HikVideoView extends FrameLayout {
 
     private final String TAG = "........HikVideoView";
 
-    public HikVideoView(final ThemedReactContext themedReactContext) {
+    public HikVideoView1(final ThemedReactContext themedReactContext) {
         super(themedReactContext);
 
         // init hikvision
