@@ -13,21 +13,11 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.rigoiot.hikvideo.utils.HikUtil;
 
 public final class HikVideoView extends FrameLayout {
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "HikVideoView";
     //----------------------------------------------------------------------------------------------
     SurfaceView surfaceView; 
     //----------------------------------------------------------------------------------------------
-    private static final int PLAY_HIK_STREAM_CODE = 1001;
-    private static final int PLAY_HIK_STREAM_CODE_2 = 1002;
-    private static final int PLAY_HIK_STREAM_CODE_3 = 1003;
-    private static final String IP_ADDRESS = "192.168.0.64";
-    private static final String IP_ADDRESS_2 = "192.168.0.65";
-    private static final String IP_ADDRESS_3 = "192.168.0.164";
-    private static final int PORT = 8000;
-    private static final String USER_NAME = "admin";
-    private static final String USER_NAME_2 = "admin";
-    private static final String PASSWORD = "rigoiot123";
-    private static final String PASSWORD_2 = "fzjs12345";
+    private static final int PLAY_HIK_STREAM_CODE = 1001; 
     //----------------------------------------------------------------------------------------------
 
     private Handler mHandler = new Handler(new Handler.Callback() {
@@ -63,6 +53,7 @@ public final class HikVideoView extends FrameLayout {
     }
 
     public void loadView(String ip, int port, String user, String psd) {
+        Log.e(TAG, ip+port+user+psd);
         HikUtil.initSDK();
         hikUtil = new HikUtil();
         hikUtil.initView(surfaceView);

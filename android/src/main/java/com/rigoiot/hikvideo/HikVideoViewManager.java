@@ -35,7 +35,7 @@ public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
     @Override
     public void onDropViewInstance(HikVideoView view) {
         super.onDropViewInstance(view);
-        view.logout();
+        view.onDropView();
     }
 
     @Override
