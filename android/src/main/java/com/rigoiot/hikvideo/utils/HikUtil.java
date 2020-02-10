@@ -53,6 +53,7 @@ public class HikUtil {
     private  int logId = -1;
     private  int playId = -1;
     private SurfaceView mSurfaceView;
+    private  int viewId = -1;
     public String mIpAddress;
     private  int mPort;
     private String mUserName;
@@ -98,6 +99,13 @@ public class HikUtil {
             public void surfaceCreated(SurfaceHolder holder) {
                 mSurfaceView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
                 Log.i(TAG, "surface is created" + m_iPort);
+                if (viewId == -1){
+                    Message message = handler.obtainMessage();
+                    // message.obj = loginState;
+                    message.what = resultCode;
+                    handler.sendMessage(message);
+                    viewId = 0;
+                }
                 if (-1 == m_iPort) {
                     return;
                 }
