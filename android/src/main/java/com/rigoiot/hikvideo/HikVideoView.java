@@ -68,8 +68,7 @@ public final class HikVideoView extends FrameLayout {
         hikUtil.playOrStopStream();
     }
 
-    public void loadView(String ip, int port, String user, String psd) {
-        Log.e(TAG, ip+port+user+psd);
+    public void loadView(String ip, int port, String user, String psd) { 
         HikUtil.initSDK();
         hikUtil = new HikUtil();
         hikUtil.initView(surfaceView, iHandler, PLAY_HIK_STREAM_CODE);
