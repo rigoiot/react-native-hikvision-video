@@ -19,12 +19,13 @@ public final class HikVideoView extends FrameLayout {
     //----------------------------------------------------------------------------------------------
     private static final int PLAY_HIK_STREAM_CODE = 1001; 
     //----------------------------------------------------------------------------------------------
-
+ 
     private Handler mHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
             switch (msg.what) {
-                case PLAY_HIK_STREAM_CODE: 
+                case PLAY_HIK_STREAM_CODE:
+                    Log.e(TAG, "HikVideoView playOrStopStream");
                     hikUtil.playOrStopStream(); 
                 default:
                     break;
@@ -37,7 +38,8 @@ public final class HikVideoView extends FrameLayout {
         @Override
         public boolean handleMessage(Message msg) {
             switch (msg.what) {
-                case PLAY_HIK_STREAM_CODE:  
+                case PLAY_HIK_STREAM_CODE: 
+                    Log.e(TAG, "HikVideoView loginDevice");
                     hikUtil.loginDevice(mHandler, PLAY_HIK_STREAM_CODE); 
                 default:
                     break;
@@ -45,13 +47,13 @@ public final class HikVideoView extends FrameLayout {
             return false;
         }
     });
-
+    
     private HikUtil hikUtil; 
  
 
     public HikVideoView(final ThemedReactContext themedReactContext) {
         super(themedReactContext); 
-
+        Log.e(TAG, "HikVideoView");
         surfaceView = new SurfaceView(themedReactContext);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
@@ -70,12 +72,12 @@ public final class HikVideoView extends FrameLayout {
         Log.e(TAG, ip+port+user+psd);
         HikUtil.initSDK();
         hikUtil = new HikUtil();
-        hikUtil.initView(surfaceView, iHandler, PLAY_HIK_STREAM_CODE););
-        hikUtil.setDeviceData(ip, port, user, psd);
-        // hikUtil.loginDevice(mHandler, PLAY_HIK_STREAM_CODE); 
+        hikUtil.initView(surfaceView, iHandler, PLAY_HIK_STREAM_CODE);
+        hikUtil.setDeviceData(ip, port, user, psd); 
+        // hikUtil.loginDevice(mHandler, PLAY_HIK_STREAM_CODE);  
     }
 
-    public void ptzControl(String command, int dwStop) {
-        hikUtil.ptzControl(command, dwStop);
+    public void ptzControl(String command, int dwStop, int dwSpeed) {
+        hikUtil.ptzControl(command, dwStop, dwSpeed);
     }
 }

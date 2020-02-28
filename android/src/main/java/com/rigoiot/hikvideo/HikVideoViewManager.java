@@ -51,7 +51,7 @@ public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
         switch (commandId){
             case COMMAND_PTZ_ID:
                 if(args != null) {
-                    video.ptzControl(args.getString(0), args.getInt(1));
+                    video.ptzControl(args.getString(0), args.getInt(1), args.getInt(2));
                 }
                 break;
             case COMMAND_CP_ID:

@@ -52,8 +52,8 @@ public class HikUtil {
     private  int m_iPlaybackID = -1;
     private  int logId = -1;
     private  int playId = -1;
-    private SurfaceView mSurfaceView;
     private  int viewId = -1;
+    private SurfaceView mSurfaceView;
     public String mIpAddress;
     private  int mPort;
     private String mUserName;
@@ -92,13 +92,14 @@ public class HikUtil {
         return true;
     }
 
-    public  void initView(SurfaceView surfaceView) {
+    public  void initView(SurfaceView surfaceView, final Handler handler, final int resultCode) {
         mSurfaceView = surfaceView;
         mSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
                 mSurfaceView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
-                Log.i(TAG, "surface is created" + m_iPort);
+                Log.i(TAG, "surface is created " + m_iPort);
+
                 if (viewId == -1){
                     Message message = handler.obtainMessage();
                     // message.obj = loginState;
@@ -106,15 +107,20 @@ public class HikUtil {
                     handler.sendMessage(message);
                     viewId = 0;
                 }
+
                 if (-1 == m_iPort) {
                     return;
                 }
                 Surface surface = holder.getSurface();
                 if (surface.isValid()) {
                     if (!Player.getInstance().setVideoWindow(m_iPort, 0, holder)) {
-                        Log.e(TAG, "播放器设置或销毁显示区域失败!");
+                        Log.e(TAG, "播放器设置或销毁显示区域失败! " + m_iPort);
+                    } else {
+                        
                     }
+                    Log.i(TAG, "surface is isValid " + m_iPort);
                 }
+
             }
 
             @Override
@@ -174,6 +180,7 @@ public class HikUtil {
             Log.e(TAG, "请先登录设备");
             return;
         }
+        Log.i(TAG, "playId:" + playId);
         if (playId < 0) {   //播放
 
             RealPlayCallBack fRealDataCallBack = getRealPlayerCbf();
@@ -194,7 +201,7 @@ public class HikUtil {
                 return;
             }
 
-            Log.i(TAG, "NetSdk 播放成功 ！");
+            Log.i(TAG, "NetSdk 播放成功 ！" + playId);
 //            mPlayButton.setText("停止");
         } else {    //停止播放
             if (playId < 0) {
@@ -228,6 +235,7 @@ public class HikUtil {
             logId = -1;
             playId = -1;
 //            mPlayButton.setText("播放");
+            Log.i(TAG, "NetSdk 停止成功 ！" + playId);
         }
 
     }
@@ -462,7 +470,7 @@ public class HikUtil {
         return null;
     }
 
-    public void ptzControl(String command, int dwStop) {
+    public void ptzControl(String command, int dwStop, int dwSpeed) {
         Log.e(TAG, command + dwStop + "------");
         int i = 0;
         switch (command) {
@@ -490,6 +498,9 @@ public class HikUtil {
         case "DOWN_RIGHT":
             i = PTZCommand.DOWN_RIGHT;
             break;
+        case "PAN_AUTO":
+            i = PTZCommand.PAN_AUTO;
+            break;
         case "ZOOM_IN":
             i = PTZCommand.ZOOM_IN;
             break;
@@ -499,8 +510,29 @@ public class HikUtil {
         case "FOCUS_NEAR":
             i = PTZCommand.FOCUS_NEAR;
             break;
-        case "FOCUS_FAR":
-            i = PTZCommand.FOCUS_FAR;
+        case "IRIS_OPEN":
+            i = PTZCommand.IRIS_OPEN;
+            break;
+        case "IRIS_CLOSE":
+            i = PTZCommand.IRIS_CLOSE;
+            break;
+        case "LIGHT_PWRON":
+            i = PTZCommand.LIGHT_PWRON;
+            break;
+        case "WIPER_PWRON":
+            i = PTZCommand.WIPER_PWRON;
+            break;
+        case "FAN_PWRON":
+            i = PTZCommand.FAN_PWRON;
+            break;
+        case "HEATER_PWRON":
+            i = PTZCommand.HEATER_PWRON;
+            break;    
+        case "AUX_PWRON1":
+            i = PTZCommand.AUX_PWRON1;
+            break;    
+        case "AUX_PWRON2":
+            i = PTZCommand.AUX_PWRON2;
             break;
         default:
             break;
@@ -508,8 +540,11 @@ public class HikUtil {
         if (i == 0) {
           return;
         }
+        if (dwSpeed == null){
+            dwSpeed = 3;
+        }
         if (!HCNetSDK.getInstance().NET_DVR_PTZControlWithSpeed_Other(
-                logId, m_iStartChan, i, 0, 3)) {
+                logId, m_iStartChan, i, 0, dwSpeed)) {
             Log.e(TAG,
                     "start PAN_LEFT failed with error code: "
                             + HCNetSDK.getInstance()
