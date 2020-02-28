@@ -541,23 +541,12 @@ public class HikUtil {
           return;
         }
         if (!HCNetSDK.getInstance().NET_DVR_PTZControlWithSpeed_Other(
-                logId, m_iStartChan, i, 0, dwSpeed)) {
-            Log.e(TAG,
-                    "start PAN_LEFT failed with error code: "
-                            + HCNetSDK.getInstance()
-                            .NET_DVR_GetLastError());
-        } else {
-            Log.i(TAG, "start PAN_LEFT succ");
-        }
-
-        if(!HCNetSDK.getInstance().NET_DVR_PTZControl_Other(logId, m_iStartChan, i, dwStop))
-    		{
-    			Log.e(TAG, "NET_DVR_PTZControl_Other " + command +" "+dwStop+ " faild!" + " err: " + HCNetSDK.getInstance().NET_DVR_GetLastError());
-    		}
-    		else
-    		{
-    			Log.e(TAG, "NET_DVR_PTZControl_Other " + command +" "+dwStop+ " succ");
-    		}
+                logId, m_iStartChan, i, dwStop, dwSpeed)) { 
+            Log.e(TAG, "NET_DVR_PTZControl_Other " + command + " " + dwStop + " faild!" 
+                + " err: " + HCNetSDK.getInstance().NET_DVR_GetLastError());
+        } else { 
+            Log.e(TAG, "NET_DVR_PTZControl_Other " + command + " " + dwStop + " succ");
+        } 
     }
 
 }
