@@ -9,11 +9,11 @@ export default class HikVideo extends React.Component {
     source: PropTypes.object.isRequired
   };
 
-  ptzControl(ptz, stop) {
+  ptzControl(ptz, stop, speed) {
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs[RCT_VIDEO_REF]),
       UIManager.HikVideoView.Commands.ptzControl,
-      [ptz, stop]
+      [ptz, stop, speed]
     );
   }
 

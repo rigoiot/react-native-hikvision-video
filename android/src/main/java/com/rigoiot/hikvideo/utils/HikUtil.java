@@ -540,9 +540,6 @@ public class HikUtil {
         if (i == 0) {
           return;
         }
-        if (dwSpeed == null){
-            dwSpeed = 3;
-        }
         if (!HCNetSDK.getInstance().NET_DVR_PTZControlWithSpeed_Other(
                 logId, m_iStartChan, i, 0, dwSpeed)) {
             Log.e(TAG,
