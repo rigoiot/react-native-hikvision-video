@@ -58,6 +58,7 @@ public class HikUtil {
     private  int mPort;
     private String mUserName;
     private String mPassWord;
+    private int mChannel;
     public  onPicCapturedListener mPicCapturedListener;
     private SimpleDateFormat sDateFormat;
     private  Player.MPInteger stWidth;
@@ -98,7 +99,7 @@ public class HikUtil {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
                 mSurfaceView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
-                Log.i(TAG, "surface is created " + m_iPort);
+                // Log.i(TAG, "surface is created " + m_iPort);
 
                 if (viewId == -1){
                     Message message = handler.obtainMessage();
@@ -150,19 +151,19 @@ public class HikUtil {
      * @param userName 用户名
      * @param passWord 密码
      */
-    public  void setDeviceData(String ipAddress, int port, String userName, String passWord) {
+    public  void setDeviceData(String ipAddress, int port, String userName, String passWord, int channel) {
         mIpAddress = ipAddress;
         mPort = port;
         mUserName = userName;
         mPassWord = passWord;
-
+        mChannel = channel;
     }
 
     public  void loginDevice(final Handler handler, final int resultCode) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                boolean loginState = login(mIpAddress, mPort, mUserName, mPassWord);
+                boolean loginState = login(mIpAddress, mPort, mUserName, mPassWord, mChannel);
                 Message message = handler.obtainMessage();
                 message.obj = loginState;
                 message.what = resultCode;
@@ -179,16 +180,14 @@ public class HikUtil {
         if (logId < 0) {
             Log.e(TAG, "请先登录设备");
             return;
-        }
-        Log.i(TAG, "playId:" + playId);
+        } 
         if (playId < 0) {   //播放
 
             RealPlayCallBack fRealDataCallBack = getRealPlayerCbf();
             if (fRealDataCallBack == null) {
                 Log.e(TAG, "fRealDataCallBack object is failed!");
                 return;
-            }
-            Log.i(TAG, "m_iStartChan:" + m_iStartChan);
+            } 
 
             NET_DVR_PREVIEWINFO previewInfo = new NET_DVR_PREVIEWINFO();
             previewInfo.lChannel = m_iStartChan;
@@ -304,11 +303,11 @@ public class HikUtil {
     }
 
 
-    private  boolean login(String ipAddress, int portNum, String userName, String passWord) {
+    private  boolean login(String ipAddress, int portNum, String userName, String passWord, int channel) {
         try {
             if (logId < 0) {
                 // 登录设备
-                logId = loginDevice(ipAddress, portNum, userName, passWord);
+                logId = loginDevice(ipAddress, portNum, userName, passWord, channel);
                 if (logId < 0) {
                     Log.e(TAG, "设备登录失败！");
                     return false;
@@ -344,25 +343,31 @@ public class HikUtil {
         }
     }
 
-    private  int loginDevice(String ipAddress, int portNum, String userName, String passWord) {
+    private  int loginDevice(String ipAddress, int portNum, String userName, String passWord, int channel) {
         //实例化设备信息对象
         m_oNetDvrDeviceInfoV30 = new NET_DVR_DEVICEINFO_V30();
         if (null == m_oNetDvrDeviceInfoV30) {
             Log.e(TAG, "实例化设备信息(NET_DVR_DEVICEINFO_V30)失败!");
             return -1;
-        }
+        } 
         // call NET_DVR_Login_v30 to login on, port 8000 as default
         int iLogID = HCNetSDK.getInstance().NET_DVR_Login_V30(ipAddress, portNum, userName, passWord, m_oNetDvrDeviceInfoV30);
         if (iLogID < 0) {
             Log.e(TAG, "网络设备登录失败!-------------Err:" + HCNetSDK.getInstance().NET_DVR_GetLastError());
             return -1;
         }
-        if (m_oNetDvrDeviceInfoV30.byChanNum > 0) {
-            m_iStartChan = m_oNetDvrDeviceInfoV30.byStartChan;
-        } else if (m_oNetDvrDeviceInfoV30.byIPChanNum > 0) {
-            m_iStartChan = m_oNetDvrDeviceInfoV30.byStartDChan;
-        }
-        Log.i(TAG, "网络设备登录成功!");
+
+        if (channel == 0) {
+            if (m_oNetDvrDeviceInfoV30.byChanNum > 0) {
+                m_iStartChan = m_oNetDvrDeviceInfoV30.byStartChan;
+            } else if (m_oNetDvrDeviceInfoV30.byIPChanNum > 0) {
+                m_iStartChan = m_oNetDvrDeviceInfoV30.byStartDChan;
+            } 
+        }else {
+            m_iStartChan = channel;
+        } 
+        
+        Log.i(TAG, "网络设备登录成功! " + channel );
 
         return iLogID;
     }

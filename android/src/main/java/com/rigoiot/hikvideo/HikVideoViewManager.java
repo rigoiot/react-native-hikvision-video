@@ -66,16 +66,25 @@ public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
 
     @ReactProp(name = "source")
     public void setSource(HikVideoView view, ReadableMap source) {
+        if (!source.hasKey("uri")){
+            return;
+        }
         String uri = source.getString("uri");
-        String user = source.getString("user");
-        String psd = source.getString("psd");
-        int port = 8000;
-  		try {
-  			port = Integer.parseInt(source.getString("port"));
-  		} catch (Exception e) {
-  			e.printStackTrace();
-  		}
+        String user = source.hasKey("user") ? source.getString("user") : "";
+        String psd = source.hasKey("psd") ? source.getString("psd") : "";
 
-      view.loadView(uri, port, user, psd);
+        int port = 8000;
+        int channel = 0;
+  		try { 
+            if (source.hasKey("port")){
+                port = Integer.parseInt(source.getString("port"));
+            }
+            if (source.hasKey("channel")){
+                channel = Integer.parseInt(source.getString("channel"));
+            }
+  		} catch (Exception e) {
+  			// e.printStackTrace();
+  		}
+        view.loadView(uri, port, user, psd, channel);
     }
 }

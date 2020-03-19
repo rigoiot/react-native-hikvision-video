@@ -24,8 +24,7 @@ public final class HikVideoView extends FrameLayout {
         @Override
         public boolean handleMessage(Message msg) {
             switch (msg.what) {
-                case PLAY_HIK_STREAM_CODE:
-                    Log.e(TAG, "HikVideoView playOrStopStream");
+                case PLAY_HIK_STREAM_CODE: 
                     hikUtil.playOrStopStream(); 
                 default:
                     break;
@@ -38,8 +37,7 @@ public final class HikVideoView extends FrameLayout {
         @Override
         public boolean handleMessage(Message msg) {
             switch (msg.what) {
-                case PLAY_HIK_STREAM_CODE: 
-                    Log.e(TAG, "HikVideoView loginDevice");
+                case PLAY_HIK_STREAM_CODE:  
                     hikUtil.loginDevice(mHandler, PLAY_HIK_STREAM_CODE); 
                 default:
                     break;
@@ -52,8 +50,7 @@ public final class HikVideoView extends FrameLayout {
  
 
     public HikVideoView(final ThemedReactContext themedReactContext) {
-        super(themedReactContext); 
-        Log.e(TAG, "HikVideoView");
+        super(themedReactContext);  
         surfaceView = new SurfaceView(themedReactContext);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
@@ -65,18 +62,24 @@ public final class HikVideoView extends FrameLayout {
 
 
     public void onDropView() { 
-        hikUtil.playOrStopStream();
+        if (hikUtil != null){
+            hikUtil.playOrStopStream();
+        }
     }
 
-    public void loadView(String ip, int port, String user, String psd) { 
+    public void loadView(String ip, int port, String user, String psd, int channel) {  
+
+        // Log.e(TAG, " -------!"+ip+ port+ user+ psd+ channel);
         HikUtil.initSDK();
         hikUtil = new HikUtil();
         hikUtil.initView(surfaceView, iHandler, PLAY_HIK_STREAM_CODE);
-        hikUtil.setDeviceData(ip, port, user, psd); 
+        hikUtil.setDeviceData(ip, port, user, psd, channel); 
         // hikUtil.loginDevice(mHandler, PLAY_HIK_STREAM_CODE);  
     }
 
     public void ptzControl(String command, int dwStop, int dwSpeed) {
-        hikUtil.ptzControl(command, dwStop, dwSpeed);
+        if (hikUtil != null){
+            hikUtil.ptzControl(command, dwStop, dwSpeed);
+        }
     }
 }
