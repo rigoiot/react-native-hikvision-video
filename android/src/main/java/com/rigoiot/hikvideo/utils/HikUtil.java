@@ -476,7 +476,6 @@ public class HikUtil {
     }
 
     public void ptzControl(String command, int dwStop, int dwSpeed) {
-        Log.e(TAG, command + dwStop + "------");
         int i = 0;
         switch (command) {
         case "TILT_UP":
