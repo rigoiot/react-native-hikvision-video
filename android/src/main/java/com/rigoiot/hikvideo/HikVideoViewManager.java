@@ -7,7 +7,12 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.bridge.ReadableMap;
 
+import android.util.Log;
+
+import java.util.Calendar;
 import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 
 /**
  * Created by oulp on 2018/3/23.
@@ -20,6 +25,15 @@ public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
 
     private static final int COMMAND_CP_ID = 2;
     private static final String COMMAND_CP_NAME = "capturePicture";
+
+    private static final int COMMAND_PLAYNVRBACK_ID = 3;
+    private static final String COMMAND_PLAYNVRBACK_NAME = "playNVRBack";
+
+    private static final int COMMAND_STOPNVRBACK_ID = 4;
+    private static final String COMMAND_STOPNVRBACK_NAME = "stopNVRBack";
+
+    private static final int COMMAND_CONTROLNVRBACK_ID = 5;
+    private static final String COMMAND_CONTROLNVRBACK_NAME = "controlNVRBack";
 
     @Override
     public String getName() {
@@ -42,7 +56,10 @@ public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
     public Map<String, Integer> getCommandsMap() {
         return MapBuilder.of(
                 COMMAND_PTZ_NAME, COMMAND_PTZ_ID,
-                COMMAND_CP_NAME, COMMAND_CP_ID
+                COMMAND_CP_NAME, COMMAND_CP_ID,
+                COMMAND_PLAYNVRBACK_NAME, COMMAND_PLAYNVRBACK_ID,
+                COMMAND_STOPNVRBACK_NAME, COMMAND_STOPNVRBACK_ID,
+                COMMAND_CONTROLNVRBACK_NAME, COMMAND_CONTROLNVRBACK_ID
         );
     }
 
@@ -56,12 +73,40 @@ public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
                 break;
             case COMMAND_CP_ID:
                 if(args != null) {
-                //   video.capturePicture(args.getString(0));
+                    //   video.capturePicture(args.getString(0));
+                }
+                break;
+            case COMMAND_PLAYNVRBACK_ID:
+                if(args != null && args.size() == 2) {
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                    try {
+                        Calendar startTime = Calendar.getInstance();
+                        startTime.setTime(format.parse(args.getString(0)));
+                        Calendar stopTime = Calendar.getInstance();
+                        stopTime.setTime(format.parse(args.getString(1)));
+
+                        video.playNVRBack(startTime, stopTime);
+                    }catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            case COMMAND_STOPNVRBACK_ID:
+                    video.stopNVRBack();
+                break;
+            case COMMAND_CONTROLNVRBACK_ID:
+                if(args != null) {
+                    video.controlNVRBack(args.getInt(0));
                 }
                 break;
             default:
                 break;
         }
+    }
+
+    @ReactProp(name = "mode")
+    public void setMode(HikVideoView view, String mode) {
+        view.setMode(mode);
     }
 
     @ReactProp(name = "source")
@@ -72,10 +117,10 @@ public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
         String uri = source.getString("uri");
         String user = source.hasKey("user") ? source.getString("user") : "";
         String psd = source.hasKey("psd") ? source.getString("psd") : "";
-
+ 
         int port = 8000;
         int channel = 0;
-  		try { 
+  		try {
             if (source.hasKey("port")){
                 port = Integer.parseInt(source.getString("port"));
             }
@@ -85,6 +130,7 @@ public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
   		} catch (Exception e) {
   			// e.printStackTrace();
   		}
-        view.loadView(uri, port, user, psd, channel);
+        view.setSourse(uri, port, user, psd, channel);
+//        view.loadView(uri, port, user, psd, channel, "");
     }
 }
