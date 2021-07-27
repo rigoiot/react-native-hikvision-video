@@ -324,7 +324,7 @@ public class HikUtil {
             Log.e(TAG, "请先登录设备");
             return;
         }
-//        findDVRFile();
+        
         stopNVRBack();
 
         NET_DVR_TIME startDVRTime = new NET_DVR_TIME();
@@ -343,7 +343,37 @@ public class HikUtil {
         stopDVRTime.dwMinute = stopTime.get(Calendar.MINUTE);
         stopDVRTime.dwSecond = stopTime.get(Calendar.SECOND);
 
+        Log.i(TAG, "playNVRBack: " + startDVRTime.ToString() + ' ' + stopDVRTime.ToString() + ' ' + m_iStartChan);
 
+        // 先查找录像文件
+        NET_DVR_FILECOND pFindCond = new NET_DVR_FILECOND();
+        pFindCond.lChannel = m_iStartChan;
+        pFindCond.dwFileType = 0;
+        pFindCond.dwIsLocked = 0;
+        pFindCond.struStartTime = startDVRTime;
+        pFindCond.struStopTime = stopDVRTime;
+        int m_FileID = HCNetSDK.getInstance().NET_DVR_FindFile_V30(logId, pFindCond);
+        Log.i(TAG, "playNVRBack NET_DVR_FindFile_V30: " + m_FileID);
+        if (m_FileID < 0) {
+            Log.e(TAG, "NET_DVR_FindFile_V30! Err:" + HCNetSDK.getInstance().NET_DVR_GetLastError());
+            return;
+        }
+        NET_DVR_FINDDATA_V30 struFileData = new NET_DVR_FINDDATA_V30();
+        while (true) {
+            int result = HCNetSDK.getInstance().NET_DVR_FindNextFile_V30(m_FileID, struFileData);
+            if (result == 1002) {
+                continue;
+            } else if (result == 1000) {
+                break;
+            } else if (result == 1003) {
+                break;
+            } else {
+                Log.i(TAG, "playNVRBack NET_DVR_FindNextFile_V30 not found: " + result);
+                return;
+            }
+        }
+
+        // 开始播放
         NET_DVR_VOD_PARA vodParma = new NET_DVR_VOD_PARA();
         vodParma.struBeginTime = startDVRTime;
         vodParma.struEndTime = stopDVRTime;
@@ -351,15 +381,11 @@ public class HikUtil {
         vodParma.struIDInfo.dwChannel = m_iStartChan;
         vodParma.hWnd = mSurfaceView.getHolder().getSurface();
 
-        Log.i(TAG, "playNVRBack:" + startDVRTime.ToString() + ' ' + stopDVRTime.ToString() + ' ' + m_iStartChan);
-
         m_iPlaybackID = HCNetSDK.getInstance().NET_DVR_PlayBackByTime_V40(logId, vodParma);
-
         if (m_iPlaybackID < 0) {
             Log.e(TAG, "NET_DVR_PlayBackByTime_V40! Err:" + HCNetSDK.getInstance().NET_DVR_GetLastError());
             return;
         }
-
 //            PlaybackCallBack fPlaybackDataCallBack = getPlayerbackPlayerCbf();
 //            if (fPlaybackDataCallBack == null) {
 //                Log.e(TAG, "fPlaybackDataCallBack object is failed!");
