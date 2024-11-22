@@ -42,7 +42,7 @@ import java.text.SimpleDateFormat;
  * 但是该例子不仅限于这种型号的。
  * 使用方法[由于要预览 2 路，所以很多静态方法，静态变量去掉了，调用流程也变化了]：
  * 1.HikUtil.initSDK();
- * 2.HikUtil hikUtil = new HikUtil();a
+ * 2.HikUtil hikUtil = new HikUtil();
  * 2.hikUtil.initView(surfaceView);
  * 3.hikUtil.setDeviceData("192.168.1.22",8000,"admin","eyecool2016");
  * 4.hikUtil.loginDevice(mHandler,LOGIN_SUCCESS_CODE);
@@ -60,7 +60,6 @@ public class HikUtil {
     private int logId = -1;
     private int playId = -1;
     private int viewId = -1;
-    private int ierror = -1;
     private SurfaceView mSurfaceView;
     public String mIpAddress;
     private int mPort;
@@ -207,7 +206,6 @@ public class HikUtil {
                 return;
             }
 
-
             Log.i(TAG, "NetSdk 播放成功 ！" + playId);
         } else {    //停止播放
             if (playId < 0) {
@@ -276,25 +274,39 @@ public class HikUtil {
         Log.i(TAG, "NetSdk 停止成功 ！" + playId);
     }
 
-    public void findDVRFile() {
+    public boolean findDVRFile(Calendar startTime, Calendar stopTime) {
         NET_DVR_FILECOND struFileCond = new NET_DVR_FILECOND();
         struFileCond.dwFileType = 0xFF;
         struFileCond.lChannel = m_iStartChan;
 //        struFileCond.dwIsLocked = 0xFF;
 //        struFileCond.dwUseCardNo = 0;
-        struFileCond.struStartTime.dwYear = 2020;
-        struFileCond.struStartTime.dwMonth = 4;
-        struFileCond.struStartTime.dwDay = 1;
-        struFileCond.struStopTime.dwYear = 2020;
-        struFileCond.struStopTime.dwMonth = 4;
-        struFileCond.struStopTime.dwDay = 20;
 
+//        startDVRTime.dwYear = startTime.get(Calendar.YEAR);
+//        startDVRTime.dwMonth = startTime.get(Calendar.MONTH) + 1;
+//        startDVRTime.dwDay = startTime.get(Calendar.DAY_OF_MONTH);
+//        startDVRTime.dwHour = startTime.get(Calendar.HOUR_OF_DAY);
+//        startDVRTime.dwMinute = startTime.get(Calendar.MINUTE);
+//        startDVRTime.dwSecond = startTime.get(Calendar.SECOND);
+
+        struFileCond.struStartTime.dwYear = startTime.get(Calendar.YEAR);
+        struFileCond.struStartTime.dwMonth = startTime.get(Calendar.MONTH) + 1;
+        struFileCond.struStartTime.dwDay = startTime.get(Calendar.DAY_OF_MONTH);
+        struFileCond.struStartTime.dwHour = startTime.get(Calendar.HOUR_OF_DAY);
+        struFileCond.struStartTime.dwMinute = startTime.get(Calendar.MINUTE);
+        struFileCond.struStartTime.dwSecond = startTime.get(Calendar.SECOND);
+
+        struFileCond.struStopTime.dwYear = stopTime.get(Calendar.YEAR);
+        struFileCond.struStopTime.dwMonth = stopTime.get(Calendar.MONTH) + 1;
+        struFileCond.struStopTime.dwDay = stopTime.get(Calendar.DAY_OF_MONTH);
+        struFileCond.struStopTime.dwHour = stopTime.get(Calendar.HOUR_OF_DAY);
+        struFileCond.struStopTime.dwMinute = stopTime.get(Calendar.MINUTE);
+        struFileCond.struStopTime.dwSecond = stopTime.get(Calendar.SECOND);
         //---------------------------------------
         //查找录像文件
         int lFindHandle = HCNetSDK.getInstance().NET_DVR_FindFile_V30(logId, struFileCond);
         if (lFindHandle < 0) {
             Log.e(TAG, "findDVRFile " + "find file fail");
-            return;
+            return false;
         }
         NET_DVR_FINDDATA_V30 struFileData = new NET_DVR_FINDDATA_V30();
         while (true) {
@@ -305,13 +317,14 @@ public class HikUtil {
             } else if (result == 1000) {
 //                char strFileName[256] = {0};
 //                sprintf(strFileName, "./%s", struFileData.sFileName);
-                break;
-            } else if (result == 1002 || result == 1003) {
+                return true;
+            } else if (result == 1003 || result == 1001 ) {
                 break;
             } else {
                 break;
             }
         }
+        return false;
     }
 
     /**
@@ -320,20 +333,17 @@ public class HikUtil {
      * @param startTime
      * @param stopTime
      */
-    public void playNVRBack(Calendar startTime, Calendar stopTime) throws Exception {
+    public void playNVRBack(Calendar startTime, Calendar stopTime) {
 
-        if (logId < 0) { 
-            throw new Exception("设备未登录，请稍后再试"); 
+        if (logId < 0) {
+            Log.e(TAG, "请先登录设备");
+            return;
         }
 
-        
         stopNVRBack();
 
-        // 查询文件是否存在
-        int ifinded = findDVRFile(startTime, stopTime);
-        if (ifinded == -1) {
-            Log.d(TAG, "未找到视频");
-            throw new Exception("未找到视频");
+        if (!findDVRFile(startTime, stopTime)){
+            return;
         }
 
         NET_DVR_TIME startDVRTime = new NET_DVR_TIME();
@@ -352,37 +362,7 @@ public class HikUtil {
         stopDVRTime.dwMinute = stopTime.get(Calendar.MINUTE);
         stopDVRTime.dwSecond = stopTime.get(Calendar.SECOND);
 
-        Log.i(TAG, "playNVRBack: " + startDVRTime.ToString() + ' ' + stopDVRTime.ToString() + ' ' + m_iStartChan);
 
-        // 先查找录像文件
-        NET_DVR_FILECOND pFindCond = new NET_DVR_FILECOND();
-        pFindCond.lChannel = m_iStartChan;
-        pFindCond.dwFileType = 0;
-        pFindCond.dwIsLocked = 0;
-        pFindCond.struStartTime = startDVRTime;
-        pFindCond.struStopTime = stopDVRTime;
-        int m_FileID = HCNetSDK.getInstance().NET_DVR_FindFile_V30(logId, pFindCond);
-        Log.i(TAG, "playNVRBack NET_DVR_FindFile_V30: " + m_FileID);
-        if (m_FileID < 0) {
-            Log.e(TAG, "NET_DVR_FindFile_V30! Err:" + HCNetSDK.getInstance().NET_DVR_GetLastError());
-            return;
-        }
-        NET_DVR_FINDDATA_V30 struFileData = new NET_DVR_FINDDATA_V30();
-        while (true) {
-            int result = HCNetSDK.getInstance().NET_DVR_FindNextFile_V30(m_FileID, struFileData);
-            if (result == 1002) {
-                continue;
-            } else if (result == 1000) {
-                break;
-            } else if (result == 1003) {
-                break;
-            } else {
-                Log.i(TAG, "playNVRBack NET_DVR_FindNextFile_V30 not found: " + result);
-                return;
-            }
-        }
-
-        // 开始播放
         NET_DVR_VOD_PARA vodParma = new NET_DVR_VOD_PARA();
         vodParma.struBeginTime = startDVRTime;
         vodParma.struEndTime = stopDVRTime;
@@ -390,11 +370,21 @@ public class HikUtil {
         vodParma.struIDInfo.dwChannel = m_iStartChan;
         vodParma.hWnd = mSurfaceView.getHolder().getSurface();
 
-        m_iPlaybackID = HCNetSDK.getInstance().NET_DVR_PlayBackByTime_V40(logId, vodParma);
-        if (m_iPlaybackID < 0) {
-            Log.e(TAG, "NET_DVR_PlayBackByTime_V40! Err:" + HCNetSDK.getInstance().NET_DVR_GetLastError());
+        Log.i(TAG, "playNVRBack:" + startDVRTime.ToString() + ' ' + stopDVRTime.ToString() + ' ' + m_iStartChan);
+
+        try {
+            m_iPlaybackID = HCNetSDK.getInstance().NET_DVR_PlayBackByTime_V40(logId, vodParma);
+
+            if (m_iPlaybackID < 0) {
+                Log.e(TAG, "NET_DVR_PlayBackByTime_V40! Err:" + HCNetSDK.getInstance().NET_DVR_GetLastError());
+                return;
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+            Log.e(TAG, "NET_DVR_PlayBackByTime_V40! Err:" + e);
             return;
         }
+
 //            PlaybackCallBack fPlaybackDataCallBack = getPlayerbackPlayerCbf();
 //            if (fPlaybackDataCallBack == null) {
 //                Log.e(TAG, "fPlaybackDataCallBack object is failed!");
@@ -436,78 +426,12 @@ public class HikUtil {
     }
 
     /**
-     * 查找文件
-     *
-     * @param startTime
-     * @param stopTime
-     */
-    public int findDVRFile(Calendar startTime, Calendar stopTime) {
-
-        NET_DVR_FILECOND struFileCond = new NET_DVR_FILECOND();
-        struFileCond.dwFileType = 0xFF;
-        struFileCond.lChannel = m_iStartChan;
-//        struFileCond.dwIsLocked = 0xFF;
-//        struFileCond.dwUseCardNo = 0;
-        struFileCond.struStartTime.dwYear = startTime.get(Calendar.YEAR);
-        struFileCond.struStartTime.dwMonth = startTime.get(Calendar.MONTH) + 1;
-        struFileCond.struStartTime.dwDay = startTime.get(Calendar.DAY_OF_MONTH);
-        struFileCond.struStartTime.dwHour = startTime.get(Calendar.HOUR_OF_DAY);
-        struFileCond.struStartTime.dwMinute = startTime.get(Calendar.MINUTE);
-        struFileCond.struStartTime.dwSecond = startTime.get(Calendar.SECOND);
-
-        struFileCond.struStopTime.dwYear = stopTime.get(Calendar.YEAR);
-        struFileCond.struStopTime.dwMonth = stopTime.get(Calendar.MONTH) + 1;
-        struFileCond.struStopTime.dwDay = stopTime.get(Calendar.DAY_OF_MONTH);
-        struFileCond.struStopTime.dwHour = stopTime.get(Calendar.HOUR_OF_DAY);
-        struFileCond.struStopTime.dwMinute = stopTime.get(Calendar.MINUTE);
-        struFileCond.struStopTime.dwSecond = stopTime.get(Calendar.SECOND);
-
-        //---------------------------------------
-        //查找录像文件
-        int iFindHandle = HCNetSDK.getInstance().NET_DVR_FindFile_V30(logId, struFileCond);
-        if (iFindHandle < 0) {
-            Log.e(TAG, "NET_DVR_FindFile_V30 failed, Error:" + HCNetSDK.getInstance().NET_DVR_GetLastError());
-            return -1;
-        }
-        Log.e(TAG, "NET_DVR_FindFile_V30 success " + iFindHandle);
-        int findNext = 0;
-        NET_DVR_FINDDATA_V30 struFindData = new NET_DVR_FINDDATA_V30();
-        while (findNext != -1)
-
-        {
-            findNext = HCNetSDK.getInstance().NET_DVR_FindNextFile_V30(iFindHandle, struFindData);
-            if (findNext == HCNetSDK.NET_DVR_FILE_SUCCESS) {
-//            System.out.println("~~~~~Find File" + new String(struFindData.sFileName));
-//            System.out.println("~~~~~File Size" + struFindData.dwFileSize);
-//            System.out.println("~~~~~File Time,from" + struFindData.struStartTime.ToString());
-//            System.out.println("~~~~~File Time,to" + struFindData.struStopTime.ToString());
-                continue;
-            } else if (HCNetSDK.NET_DVR_FILE_NOFIND == findNext) {
-                Log.e(TAG, "No file found");
-                return -1;
-            } else if (HCNetSDK.NET_DVR_NOMOREFILE == findNext) {
-//            System.out.println("All files are listed");
-                break;
-            } else if (HCNetSDK.NET_DVR_FILE_EXCEPTION == findNext) {
-                Log.e(TAG, "Exception in searching");
-                return -1;
-            } else if (HCNetSDK.NET_DVR_ISFINDING == findNext) {
-//            System.out.println("NET_DVR_ISFINDING");
-            }
-        }
-        HCNetSDK.getInstance().
-
-                NET_DVR_FindClose_V30(iFindHandle);
-        return 0;
-    }
-
-    /**
      * 播放控制
      *
      * @param dwControlCode 1开始播放、3暂停播放、4恢复播放、5快放、6慢放、
      */
     public void controlNVRBack(int dwControlCode) {
- 
+
         if (logId < 0 || m_iPlaybackID < 0) {
             return;
         }
@@ -699,13 +623,7 @@ public class HikUtil {
     private ExceptionCallBack getExceptiongCbf() {
         ExceptionCallBack oExceptionCbf = new ExceptionCallBack() {
             public void fExceptionCallBack(int iType, int iUserID, int iHandle) {
-                Log.e(TAG, "Exception! type:" + iType + ", ierror: " + ierror);
-                if (iType == 32791) {
-                    ierror = -1;
-                } else {
-                    ierror = 1;
-                }
-                // System.out.println("recv exception------------------------------, type:" + iType);
+                System.out.println("recv exception------------------------------, type:" + iType);
             }
         };
         return oExceptionCbf;
@@ -828,12 +746,7 @@ public class HikUtil {
      * @param dwStop
      * @param dwSpeed
      */
-    public void ptzControl(String command, int dwStop, int dwSpeed) { 
-
-        if (logId < 0 || ierror == 1) {
-            return;
-        }
-
+    public void ptzControl(String command, int dwStop, int dwSpeed) {
         int i = 0;
         switch (command) {
             case "TILT_UP":
