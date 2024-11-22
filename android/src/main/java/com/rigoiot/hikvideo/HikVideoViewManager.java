@@ -1,24 +1,21 @@
 package com.rigoiot.hikvideo;
 
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
-import com.facebook.react.bridge.ReadableMap;
 
-import android.util.Log;
-
-import java.util.Calendar;
 import java.util.Map;
-import java.text.SimpleDateFormat;
-import java.text.ParseException;
 
 /**
  * Created by oulp on 2018/3/23.
  */
 
 public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
+
+    private static final String TAG = "HikVideoViewManager";
 
     private static final int COMMAND_PTZ_ID = 1;
     private static final String COMMAND_PTZ_NAME = "ptzControl";
@@ -52,6 +49,11 @@ public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
         view.onDropView();
     }
 
+    public Map getExportedCustomBubblingEventTypeConstants() {
+        return MapBuilder.builder().put("onChange",
+                MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", "onChange"))).build();
+    }
+
     @Override
     public Map<String, Integer> getCommandsMap() {
         return MapBuilder.of(
@@ -63,39 +65,29 @@ public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
         );
     }
 
-//    @Override
+    //    @Override
     public void receiveCommand(HikVideoView video, int commandId, ReadableArray args) {
-        switch (commandId){
+        switch (commandId) {
             case COMMAND_PTZ_ID:
-                if(args != null) {
+                if (args != null) {
                     video.ptzControl(args.getString(0), args.getInt(1), args.getInt(2));
                 }
                 break;
             case COMMAND_CP_ID:
-                if(args != null) {
+                if (args != null) {
                     //   video.capturePicture(args.getString(0));
                 }
                 break;
             case COMMAND_PLAYNVRBACK_ID:
-                if(args != null && args.size() == 2) {
-                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-                    try {
-                        Calendar startTime = Calendar.getInstance();
-                        startTime.setTime(format.parse(args.getString(0)));
-                        Calendar stopTime = Calendar.getInstance();
-                        stopTime.setTime(format.parse(args.getString(1)));
-
-                        video.playNVRBack(startTime, stopTime);
-                    }catch (ParseException e) {
-                        e.printStackTrace();
-                    }
+                if (args != null && args.size() == 2) {
+                   video.playNVRBack(args.getString(0), args.getString(1));
                 }
                 break;
             case COMMAND_STOPNVRBACK_ID:
-                    video.stopNVRBack();
+                video.stopNVRBack();
                 break;
             case COMMAND_CONTROLNVRBACK_ID:
-                if(args != null) {
+                if (args != null) {
                     video.controlNVRBack(args.getInt(0));
                 }
                 break;
@@ -111,25 +103,25 @@ public class HikVideoViewManager extends SimpleViewManager<HikVideoView> {
 
     @ReactProp(name = "source")
     public void setSource(HikVideoView view, ReadableMap source) {
-        if (!source.hasKey("uri")){
+        if (!source.hasKey("uri")) {
             return;
         }
         String uri = source.getString("uri");
         String user = source.hasKey("user") ? source.getString("user") : "";
         String psd = source.hasKey("psd") ? source.getString("psd") : "";
- 
+
         int port = 8000;
         int channel = 0;
-  		try {
-            if (source.hasKey("port")){
+        try {
+            if (source.hasKey("port")) {
                 port = Integer.parseInt(source.getString("port"));
             }
-            if (source.hasKey("channel")){
+            if (source.hasKey("channel")) {
                 channel = Integer.parseInt(source.getString("channel"));
             }
-  		} catch (Exception e) {
-  			// e.printStackTrace();
-  		}
+        } catch (Exception e) {
+            // e.printStackTrace();
+        }
         view.setSourse(uri, port, user, psd, channel);
 //        view.loadView(uri, port, user, psd, channel, "");
     }

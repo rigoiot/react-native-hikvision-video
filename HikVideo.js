@@ -3,12 +3,25 @@ import { requireNativeComponent, View, UIManager, findNodeHandle } from 'react-n
 import PropTypes from 'prop-types';
 
 const RCT_VIDEO_REF = 'HikVideoView';
+
+const NVR_CONROL = {
+  PAUSE: 3,
+  RESTART: 4,
+  SPEED: 5,
+  SLOW: 6,
+};
+
 export default class HikVideo extends React.Component {
   static propTypes = {
     ...View.propTypes,
     mode: PropTypes.string,
     source: PropTypes.object.isRequired,
   };
+
+  constructor(props) {
+    super(props);
+    this._onChange = this._onChange.bind(this);
+  }
 
   ptzControl(ptz, stop, speed) {
     UIManager.dispatchViewManagerCommand(
@@ -50,7 +63,7 @@ export default class HikVideo extends React.Component {
     UIManager.dispatchViewManagerCommand(
       findNodeHandle(this.refs[RCT_VIDEO_REF]),
       UIManager.HikVideoView.Commands.controlNVRBack,
-      [code],
+      [NVR_CONROL[code]],
     );
   }
 
@@ -62,12 +75,19 @@ export default class HikVideo extends React.Component {
     );
   }
 
+  _onChange(event) {
+    if (!this.props.onChange) {
+      return;
+    }
+    this.props.onChange(event.nativeEvent);
+  }
+
   render() {
     const props = {
       mode: 'realplay',
       ...this.props,
     };
-    return <RCTView ref={RCT_VIDEO_REF} {...props} />;
+    return <RCTView ref={RCT_VIDEO_REF} {...props} onChange={this._onChange} />;
   }
 }
 

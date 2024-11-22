@@ -1,17 +1,21 @@
 package com.rigoiot.hikvideo;
 
-import android.app.Activity;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.SurfaceView;
 import android.widget.FrameLayout;
-import android.util.Log;
 
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.ThemedReactContext;
+import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.rigoiot.hikvideo.utils.HikUtil;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public final class HikVideoView extends FrameLayout {
@@ -104,21 +108,48 @@ public final class HikVideoView extends FrameLayout {
         }
     }
 
-    public void playNVRBack(Calendar startTime, Calendar stopTime) {
-        if (hikUtil != null) {
-            hikUtil.playNVRBack(startTime, stopTime);
+    public void playNVRBack(String startTime, String stopTime) {
+
+        if (hikUtil == null) {
+            return;
+        }
+
+        Log.d(TAG, startTime + " " + stopTime);
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Calendar st = Calendar.getInstance();
+            st.setTime(format.parse(startTime));
+            Calendar et = Calendar.getInstance();
+            et.setTime(format.parse(stopTime));
+            hikUtil.playNVRBack(st, et);
+            onReceiveNativeEvent("play", null);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            onReceiveNativeEvent(null, e.getMessage());
         }
     }
 
     public void stopNVRBack() {
         if (hikUtil != null) {
             hikUtil.stopNVRBack();
+            onReceiveNativeEvent("stop", null);
         }
     }
 
     public void controlNVRBack(int dwControlCode) {
         if (hikUtil != null) {
             hikUtil.controlNVRBack(dwControlCode);
+            onReceiveNativeEvent(dwControlCode+"", null);
         }
+    }
+
+    public void onReceiveNativeEvent(String state, String error) {
+        WritableMap event = Arguments.createMap();
+        event.putString("state", state);
+        event.putString("error", error);
+        ReactContext reactContext = (ReactContext) getContext();
+        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "onChange", event);
     }
 }
